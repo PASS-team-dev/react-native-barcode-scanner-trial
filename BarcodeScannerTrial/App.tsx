@@ -9,36 +9,10 @@
  */
 
 import React from 'react';
-import {
-  StyleSheet,
-  View,
-  Text,
-  TouchableOpacity,
-} from 'react-native';
-
-import { RNCamera } from 'react-native-camera';
-
-const PendingView = () => (
-  <View
-    style={{
-      flex: 1,
-      backgroundColor: 'lightgreen',
-      justifyContent: 'center',
-      alignItems: 'center',
-    }}
-  >
-    <Text>Waiting</Text>
-  </View>
-);
+import {StyleSheet, Text, TouchableOpacity, View} from 'react-native';
+import {RNCamera, RNCameraProps} from 'react-native-camera';
 
 const SampleCamera: React.FC = () => {
-  const takePicture = async (camera: RNCamera) => {
-    const options = { quality: 0.5, base64: true };
-    const data = await camera.takePictureAsync(options);
-    //  eslint-disable-next-line
-    console.log(data.uri);
-  };
-
   return (
     <View style={styles.container}>
       <RNCamera
@@ -56,21 +30,47 @@ const SampleCamera: React.FC = () => {
           message: 'We need your permission to use your audio',
           buttonPositive: 'Ok',
           buttonNegative: 'Cancel',
-        }}
-      >
-        {({ camera, status }) => {
-          if (status !== 'READY') return <PendingView />;
-          return (
-            <View style={{ flex: 0, flexDirection: 'row', justifyContent: 'center' }}>
-              <TouchableOpacity onPress={() => takePicture(camera)} style={styles.capture}>
-                <Text style={{ fontSize: 14 }}> SNAP </Text>
-              </TouchableOpacity>
-            </View>
-          );
-        }}
+        }}>
+        {child}
       </RNCamera>
     </View>
   );
+};
+
+type CameraChild = Extract<NonNullable<RNCameraProps['children']>, Function>;
+
+const child: CameraChild = ({camera, status}) => {
+  if (status !== 'READY') {
+    return <PendingView />;
+  }
+
+  return (
+    <View style={{flex: 0, flexDirection: 'row', justifyContent: 'center'}}>
+      <TouchableOpacity
+        onPress={() => takePicture(camera)}
+        style={styles.capture}>
+        <Text style={{fontSize: 14}}> SNAP </Text>
+      </TouchableOpacity>
+    </View>
+  );
+};
+
+const PendingView = () => (
+  <View
+    style={{
+      flex: 1,
+      backgroundColor: 'lightgreen',
+      justifyContent: 'center',
+      alignItems: 'center',
+    }}>
+    <Text>Waiting</Text>
+  </View>
+);
+
+const takePicture = async (camera: RNCamera) => {
+  const options = {quality: 0.5, base64: true};
+  const data = await camera.takePictureAsync(options);
+  console.log(data.uri);
 };
 
 const styles = StyleSheet.create({
