@@ -22,6 +22,7 @@ const SampleCamera: React.FC = () => {
         type={RNCamera.Constants.Type.back}
         flashMode={RNCamera.Constants.FlashMode.on}
         onBarCodeRead={({data, type, rawData}) => {
+          // FIXME: stop reading same codes repeatedly
           console.log({barcode: {data, type, rawData}});
           setBarcode(data);
         }}
